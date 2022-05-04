@@ -1,7 +1,11 @@
-# Packet Encryptor
+# Packet Crypto
 Python数据传输加密中间件, 适用于体积不大的数据传输.基于RSA, AES实现的数据加密模块.
+适用于:
+- API服务器数据加密传输
+
 
 ## Usage
+API服务器数据加密传输:
 用户端代码
 ```python
 #client

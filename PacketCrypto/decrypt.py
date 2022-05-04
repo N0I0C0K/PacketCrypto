@@ -19,6 +19,11 @@ def setPrivateKey(key: str = None):
 
 
 def decryptPacket(source: typing.Union[dict, EncryptData]) -> bytes:
+    '''
+    decrypto from `dict | EncryptData`
+    :param source: the source data , type of`dict | EncryptData`
+    :return: decrypto data `bytes`
+    '''
     data: EncryptData = None
     if isinstance(source, EncryptData):
         data = source

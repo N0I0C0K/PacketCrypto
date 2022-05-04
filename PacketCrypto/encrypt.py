@@ -12,9 +12,14 @@ init = False
 public_key: rsa.PublicKey = None
 
 
-def setPublicKey(key: str):
-    global public_key
-    public_key = rsa.PublicKey.load_pkcs1(key.encode())
+def setPublicKey(key: str = None):
+    global public_key, init
+    if key:
+        public_key = rsa.PublicKey.load_pkcs1(key.encode())
+    else:
+        with open(model_path+'\\public_key', 'rb') as file:
+            public_key = rsa.PublicKey.load_pkcs1(file.read())
+    init = True
 
 
 def encryptPacket(data: Union[str, dict, bytes]) -> EncryptData:
@@ -24,15 +29,15 @@ def encryptPacket(data: Union[str, dict, bytes]) -> EncryptData:
     :return: `EncryptData` like `{'data':encode data, 'sign': sign, 'nonce': decode needed param, 'key': rsa encrypt key}`
     '''
     assert init, 'public key is not vaild, `setPublicKey(...)` before encrypto'
-    if isinstance(s, dict):
+    if isinstance(data, dict):
         s = json.dumps(data).encode()
-    elif isinstance(s, str):
+    elif isinstance(data, str):
         s = data.encode()
-    elif isinstance(s, bytes):
+    elif isinstance(data, bytes):
         s = data
     else:
         raise ValueError('unsupport format')
-    key = secrets.token_bytes(64)
+    key = rsa.randnum.read_random_bits(128)
     aes_encryptor = CryCes.new(key, CryCes.MODE_EAX)
 
     encode_s, sign = aes_encryptor.encrypt_and_digest(s)

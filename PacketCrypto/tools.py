@@ -21,6 +21,3 @@ def generateRsaKey():
         file.write(pub.save_pkcs1())
     print(f'{set_color("public key", COLOR.BLUE)}:\n{pub.save_pkcs1().decode()}')
     print(f'{set_color("private key", COLOR.CYAN)}:\n{pri.save_pkcs1().decode()}')
-
-
-generateRsaKey()

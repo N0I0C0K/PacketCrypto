@@ -1,9 +1,11 @@
 import sys
+import os
 from typing import Union
 from pydantic import BaseModel
 
-__all__ = ['COLOR', 'set_color','EncryptData']
+__all__ = ['COLOR', 'set_color', 'EncryptData', 'model_path']
 
+model_path = os.path.dirname(__file__)
 
 color_support = True
 

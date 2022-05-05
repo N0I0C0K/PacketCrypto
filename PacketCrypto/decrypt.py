@@ -18,11 +18,12 @@ def setPrivateKey(key: str = None):
     init = True
 
 
-def decryptPacket(source: typing.Union[dict, EncryptData], key: typing.ByteString = None) -> bytes:
+def decryptPacket(source: typing.Union[dict, EncryptData], *, key: typing.ByteString = None, custom_private_key: rsa.PrivateKey = None) -> bytes:
     '''
     decrypto from `dict | EncryptData`
     :param source: the source data , type of`dict | EncryptData`
     :param key : custom key , use means no random key
+    :param custom_private_key : use custom private key.
     :return: decrypto data `bytes`
     '''
     data: EncryptData = None
@@ -32,8 +33,12 @@ def decryptPacket(source: typing.Union[dict, EncryptData], key: typing.ByteStrin
         data = EncryptData.parse_obj(source)
     else:
         raise ValueError('unsupported format')
-    key = rsa.decrypt(base64.b64decode(data.key),
-                      private_key) if key is None else key
+    if key is None:
+        custom_private_key = private_key if custom_private_key is None else custom_private_key
+        if custom_private_key is None:
+            raise ValueError('please init private key')
+        key = rsa.decrypt(base64.b64decode(data.key),
+                          custom_private_key)
     aes_encrypt = CryCes.new(key, CryCes.MODE_EAX,
                              nonce=base64.b64decode(data.nonce))
     res = aes_encrypt.decrypt_and_verify(base64.b64decode(

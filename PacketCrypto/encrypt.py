@@ -2,7 +2,7 @@ import rsa
 import base64
 import secrets
 import json
-from typing import Dict, Union
+import typing
 from .utils import *
 import Crypto.Cipher.AES as CryCes
 
@@ -22,10 +22,11 @@ def setPublicKey(key: str = None):
     init = True
 
 
-def encryptPacket(data: Union[str, dict, bytes]) -> EncryptData:
+def encryptPacket(data: typing.Union[str, dict, bytes], key: typing.ByteString = None) -> EncryptData:
     '''
     encrypto a dict type od data
     :param data: source data, suppost `str | dict | bytes`
+    :param key : custom key , use means no random key
     :return: `EncryptData` like `{'data':encode data, 'sign': sign, 'nonce': decode needed param, 'key': rsa encrypt key}`
     '''
     assert init, 'public key is not vaild, `setPublicKey(...)` before encrypto'
@@ -37,9 +38,8 @@ def encryptPacket(data: Union[str, dict, bytes]) -> EncryptData:
         s = data
     else:
         raise ValueError('unsupport format')
-    key = rsa.randnum.read_random_bits(128)
+    key = rsa.randnum.read_random_bits(128) if key is None else key
     aes_encryptor = CryCes.new(key, CryCes.MODE_EAX)
-
     encode_s, sign = aes_encryptor.encrypt_and_digest(s)
     encode_s, sign = base64.b64encode(
         encode_s).decode(), base64.b64encode(sign).decode()

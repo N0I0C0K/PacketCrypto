@@ -34,13 +34,13 @@ class Session:
         self.key: bytes = None
         self.encode_key: str = None
 
-    def encrypto(self, source) -> EncryptData:
+    def encrypt(self, source) -> EncryptData:
         data, self.key = encryptPacket(
             source, key=self.key, encode_key=self.encode_key, custom_public_key=self.public_key)
         self.encode_key = data.key
         return data
 
-    def decrypto(self, source: typing.Union[EncryptData, dict]) -> bytes:
+    def decrypt(self, source: typing.Union[EncryptData, dict]) -> bytes:
         self.encode_key = source.key
         data, self.key = decryptPacket(source, key=self.key,
                                        custom_private_key=self.private_key)

@@ -30,10 +30,10 @@ RICdAkRAjOTHq78CHkMtfb0T+sAguF2swK8bnreylzrjp47okN/WQ9J9iQIiIrcP
 
 
 def session_test():
-    sender = Session(public_key=public)
-    recv = Session(private_key=private)
-    print(recv.decrypto(sender.encrypto({'name': 'sender send'})))
-    print(sender.decrypto(recv.encrypto({'name': 'recv send'})))
+    sender_crypto = Session(public_key=public)
+    recv_crypto = Session(private_key=private)
+    print(recv_crypto.decrypt(sender_crypto.encrypt({'name': 'sender_crypto send'})))
+    print(sender_crypto.decrypt(recv_crypto.encrypt({'name': 'recv send'})))
 
 
 session_test()

@@ -7,6 +7,8 @@ from .utils import *
 init = False
 private_key: rsa.PrivateKey = None
 
+__all__ = ['setPrivateKey', 'decryptPacket']
+
 
 def setPrivateKey(key: str = None):
     global private_key, init
@@ -18,13 +20,15 @@ def setPrivateKey(key: str = None):
     init = True
 
 
-def decryptPacket(source: typing.Union[dict, EncryptData], *, key: typing.ByteString = None, custom_private_key: rsa.PrivateKey = None) -> bytes:
+def decryptPacket(source: typing.Union[dict, EncryptData], *,
+                  key: typing.ByteString = None,
+                  custom_private_key: rsa.PrivateKey = None) -> typing.Tuple[bytes, bytes]:
     '''
     decrypto from `dict | EncryptData`
     :param source: the source data , type of`dict | EncryptData`
     :param key : custom key , use means no random key
     :param custom_private_key : use custom private key.
-    :return: decrypto data `bytes`
+    :return: a tuple of decrypto data `bytes` and the key aes use
     '''
     data: EncryptData = None
     if isinstance(source, EncryptData):
@@ -43,4 +47,4 @@ def decryptPacket(source: typing.Union[dict, EncryptData], *, key: typing.ByteSt
                              nonce=base64.b64decode(data.nonce))
     res = aes_encrypt.decrypt_and_verify(base64.b64decode(
         data.data), base64.b64decode(data.sign))
-    return res
+    return res, key

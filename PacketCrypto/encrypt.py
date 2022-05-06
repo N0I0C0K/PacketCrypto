@@ -22,13 +22,16 @@ def setPublicKey(key: str = None):
     init = True
 
 
-def encryptPacket(data: typing.Union[str, dict, bytes], *, key: typing.ByteString = None, encode_key: typing.ByteString = None, custom_public_key: rsa.PublicKey = None) -> typing.Tuple[EncryptData, bytes]:
+def encryptPacket(data: typing.Union[str, dict, bytes], *,
+                  key: typing.ByteString = None,
+                  encode_key: typing.ByteString = None,
+                  custom_public_key: rsa.PublicKey = None) -> typing.Tuple[EncryptData, bytes]:
     '''
     encrypto a dict type od data
     :param data: source data, suppost `str | dict | bytes`
     :param key : custom key , use means no random key
     :param custom_public_key: use custom public key
-    :return:a `EncryptData` object and key
+    :return:a tuple of `EncryptData` object and the key aes use
     '''
     if isinstance(data, dict):
         s = json.dumps(data).encode()
@@ -43,8 +46,10 @@ def encryptPacket(data: typing.Union[str, dict, bytes], *, key: typing.ByteStrin
     encode_s, sign = aes_encryptor.encrypt_and_digest(s)
     encode_s, sign = base64.b64encode(
         encode_s).decode(), base64.b64encode(sign).decode()
-    custom_public_key = public_key if custom_public_key is None else custom_public_key
-    if custom_public_key is None:
-        raise ValueError('please init public key before use')
-    encode_key = base64.b64encode(rsa.encrypt(key, custom_public_key)).decode()
+    if encode_key is None:
+        custom_public_key = public_key if custom_public_key is None else custom_public_key
+        if custom_public_key is None:
+            raise ValueError('please init public key before use')
+        encode_key = base64.b64encode(
+            rsa.encrypt(key, custom_public_key)).decode()
     return EncryptData.parse_obj({'data': encode_s, 'sign': sign, 'nonce': base64.b64encode(aes_encryptor.nonce).decode(), 'key': encode_key}), key

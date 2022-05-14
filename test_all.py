@@ -27,13 +27,28 @@ RICdAkRAjOTHq78CHkMtfb0T+sAguF2swK8bnreylzrjp47okN/WQ9J9iQIiIrcP
 -----END RSA PRIVATE KEY-----
 '''
 
+setPublicKey(public)
+setPrivateKey(private)
 
-def session_test():
+
+def test_session():
     sender_crypto = Session(public_key=public)
     recv_crypto = Session(private_key=private)
-    print(recv_crypto.decrypt(sender_crypto.encrypt(
-        {'name': 'sender_crypto send'})))
-    print(sender_crypto.decrypt(recv_crypto.encrypt({'name': 'recv send'})))
+    assert recv_crypto.decrypt(sender_crypto.encrypt(
+        'test send')).decode() == 'test send'
+    assert sender_crypto.decrypt(
+        recv_crypto.encrypt('test recv')).decode() == 'test recv'
 
 
-session_test()
+def test_encrypto_decrypto():
+    res, key = decryptPacket(encryptPacket('test encrypto')[0])
+    assert res.decode() == 'test encrypto'
+
+
+def test_bytes_encrypto():
+    a = encryptPacket_btyes(
+        '12311')[0]
+    assert decryptPacket_bytes(a)[0].decode() == '12311'
+
+
+test_bytes_encrypto()

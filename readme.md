@@ -49,4 +49,4 @@ Python数据传输加密中间件, 适用于体积不大的数据传输.基于RS
     send(recv_crypto.encrypt({'name':'recv send'}))
     ```
 
-    可以去看看`test.py`里的`session_test()`
+    可以去看看`test_all.py`里的`session_test()`

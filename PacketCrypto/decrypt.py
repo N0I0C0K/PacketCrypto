@@ -7,7 +7,7 @@ from .utils import *
 init = False
 private_key: rsa.PrivateKey = None
 
-__all__ = ['setPrivateKey', 'decryptPacket']
+__all__ = ['setPrivateKey', 'decryptPacket', 'decryptPacket_bytes']
 
 
 def setPrivateKey(key: str = None):
@@ -48,3 +48,35 @@ def decryptPacket(source: typing.Union[dict, EncryptData], *,
     res = aes_encrypt.decrypt_and_verify(base64.b64decode(
         data.data), base64.b64decode(data.sign))
     return res, key
+
+
+def decryptPacket_bytes(source : typing.ByteString, *,
+                        key: typing.ByteString = None,
+                        custom_private_key: rsa.PrivateKey = None) -> typing.Tuple[bytes, bytes]:
+    '''
+    decrypto from `bytes`
+    :param source: the source data, must bytes.
+    :param key : custom key , use means no random key
+    :param custom_private_key : use custom private key.
+    :return: a tuple of decrypto data `bytes` and the key aes use
+    '''
+    source = bytearray(source)
+    nonce_len = int.from_bytes(source[0:4], 'big')
+    key_len = int.from_bytes(source[4:8], 'big')
+    sign_len = int.from_bytes(source[8:12], 'big')
+    idx = 12
+    nonce = source[idx:idx+nonce_len]
+    idx = idx+nonce_len
+    if key is None:
+        custom_private_key = private_key if custom_private_key is None else custom_private_key
+        if custom_private_key is None:
+            raise ValueError('please init private key')
+        key = rsa.decrypt(bytes(source[idx:idx+key_len]),
+                          custom_private_key)
+    idx = idx+key_len
+    sign = source[idx:idx+sign_len]
+    idx = idx+sign_len
+    data = source[idx:]
+    aes_encrypt = CryCes.new(key, CryCes.MODE_EAX,
+                             nonce=nonce)
+    return aes_encrypt.decrypt_and_verify(data, sign), key

@@ -8,20 +8,20 @@ model_path = os.path.dirname(__file__)
 
 
 class EncryptData:
-    def __init__(self) -> None:
-        self.data: str = None
-        self.sign: str = None
-        self.key: str = None
-        self.nonce: str = None
+    data: str = None
+    sign: str = None
+    key: str = None
+    nonce: str = None
 
     def dict(self) -> dict:
-        res = {}
-        for key in self.__init__.__code__.co_names:
-            res.update({key: self.__getattribute__(key)})
-        return res
+        return self.__dict__.copy()
 
-    @staticmethod
-    def parse_obj(obj: dict) -> 'EncryptData':
+    @classmethod
+    def parse_obj(cls, obj: dict) -> 'EncryptData':
         res = EncryptData()
+        if '__annotations__' in cls.__dict__:
+            for key in cls.__annotations__.keys():
+                if key not in obj:
+                    raise KeyError(f'variable {key} is miss')
         res.__dict__.update(obj)
         return res

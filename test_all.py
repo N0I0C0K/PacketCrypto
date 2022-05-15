@@ -51,4 +51,9 @@ def test_bytes_encrypto():
     assert decryptPacket_bytes(a)[0].decode() == '12311'
 
 
+def test_EncryptData():
+    a = EncryptData.parse_obj({'data': 1, 'nonce': 1, 'sign': 1, 'key': 1})
+    assert a.dict() == {'data': 1, 'nonce': 1, 'sign': 1, 'key': 1}
+
+
 test_bytes_encrypto()
